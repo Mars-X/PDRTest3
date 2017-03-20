@@ -321,6 +321,7 @@
 		8CF556D31E7B7A0E00C77C64 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -371,6 +372,7 @@
 		8CF556D41E7B7A0E00C77C64 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -414,6 +416,7 @@
 		8CF556D61E7B7A0E00C77C64 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = X9ZPU3ABG5;
 				INFOPLIST_FILE = PDRtest3/Info.plist;
@@ -427,6 +430,7 @@
 		8CF556D71E7B7A0E00C77C64 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = X9ZPU3ABG5;
 				INFOPLIST_FILE = PDRtest3/Info.plist;
@@ -514,6 +518,7 @@
 				8CF556D71E7B7A0E00C77C64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8CF556D81E7B7A0E00C77C64 /* Build configuration list for PBXNativeTarget "PDRtest3Tests" */ = {
 			isa = XCConfigurationList;
@@ -522,6 +527,7 @@
 				8CF556DA1E7B7A0E00C77C64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8CF556DB1E7B7A0E00C77C64 /* Build configuration list for PBXNativeTarget "PDRtest3UITests" */ = {
 			isa = XCConfigurationList;
@@ -530,6 +536,7 @@
 				8CF556DD1E7B7A0E00C77C64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
