@@ -29,9 +29,11 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     /////////各种管理器
     var locationManage:CLLocationManager = CLLocationManager.init()
     let fileManager = FileManager.default
+    let motionManager:CMMotionManager = CMMotionManager.init()
     
     ////////数据采集器
     let pedometer = CMPedometer.init()
+    
     
     //////////////跟日期相关的对象
     let dateFormatter = DateFormatter.init()
