@@ -34,7 +34,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     ////////数据采集器
     let pedometer = CMPedometer.init()
     
-    
+
     //////////////跟日期相关的对象
     let dateFormatter = DateFormatter.init()
     let calendar = Calendar.current
@@ -45,7 +45,8 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     //////////////让连续的航向显示变为离散所用到的对象
     static var changedValue = 0
     var currentHeading = 0.0
-    
+    var currentAcceleration:CMAcceleration? = CMAcceleration.init()
+
     
     //////两个TextView显示用到的数组
     var Arr_TV_Distance:[String] = []
@@ -103,12 +104,6 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         if CMPedometer.isDistanceAvailable()
         {
             
-            if (self.timer == nil)
-            {
-                self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.timerForWriteFile), userInfo: nil, repeats: true)
-            }
-
-            
             self.nowTime = Date()
             
             let tempSet:Set<Calendar.Component> = [Calendar.Component.year,Calendar.Component.month,Calendar.Component.day,Calendar.Component.hour,Calendar.Component.minute,Calendar.Component.second,Calendar.Component.nanosecond]
@@ -126,18 +121,26 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 //            })//end of closure
             
            //MARK:开始更新计步器
-            self.pedometer.startUpdates(from: Date(), withHandler: { (data, error) in
-                if error != nil
-                {
-                    self.Label_Distance.text = "距离检测错误:\(error)"
-                }else{
-                    self.Label_Distance.text = "\((data?.distance)!)"       //注意 这里会是累积计算行走距离 因为是从按下按钮的当前时间开始的
-//                    self.Str_TV_Distance = "\(self.dateFormatter.string(from: Date())) \(Int((data?.distance)!))米\n".appending(self.Str_TV_Distance!)
-//                    self.TextView_Distance.text = self.Str_TV_Distance
-                }
-            })//end of closure
+//            self.pedometer.startUpdates(from: Date(), withHandler: { (data, error) in
+//                if error != nil
+//                {
+//                    self.Label_Distance.text = "距离检测错误:\(error)"
+//                }else{
+//                    self.Label_Distance.text = "\((data?.distance)!)"       //注意 这里会是累积计算行走距离 因为是从按下按钮的当前时间开始的
+////                    self.Str_TV_Distance = "\(self.dateFormatter.string(from: Date())) \(Int((data?.distance)!))米\n".appending(self.Str_TV_Distance!)
+////                    self.TextView_Distance.text = self.Str_TV_Distance
+//                }
+//            })//end of closure
+            if (self.timer == nil)
+            {
+                timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+            }
             
-            
+            var tempQueue = OperationQueue.init()
+            self.motionManager.startAccelerometerUpdates(to: tempQueue , withHandler: { (data, error) in
+//                print((data?.acceleration.y)!)
+               self.currentAcceleration = data?.acceleration //实时更新acceleration
+            })
             
         }// end of if
         
@@ -147,7 +150,8 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     
     //////停止更新Btn
     @IBAction func Btn_Action_Stop(_ sender: Any) {
-        self.pedometer.stopUpdates()
+        self.motionManager.stopAccelerometerUpdates()
+//        self.pedometer.stopUpdates()
         self.locationManage.stopUpdatingHeading()
     }
     
@@ -191,10 +195,13 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     
     //MARK:-
     //MARK:自定义方法
-    func timerForWriteFile()
+    func timerAction()
     {
 //        print("1")
-        self.Int_Timer_currentSecond = self.Int_Timer_currentSecond + 1
+//        self.Int_Timer_currentSecond = self.Int_Timer_currentSecond + 1
+        self.Label_x.text = "\(Int((currentAcceleration!.z)))"
+        self.Label_y.text = "\(Int((currentHeading)))"
+
     }
     
 }
