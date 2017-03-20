@@ -23,7 +23,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 //MARK:全局变量、常量
     /////宏
     let HEADINGLIMIT = 50 //超过这个值时保存记录
-    let TIMEINTERVAL = 0.1    //获取数据的时间间隔
+    let TIMEINTERVAL = 1    //获取数据的时间间隔
     
     var currentPosition:CGPoint = CGPoint.init(x: 0, y: 0)
     
@@ -168,39 +168,8 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         self.Label_Heading.text = "\(newHeading.trueHeading)"
         
-        ViewController.changedValue += abs(Int(newHeading.trueHeading - self.currentHeading))
-        
-        if ViewController.changedValue > HEADINGLIMIT
-        {
-            Str_FileSave_singleItem = "\(self.dateFormatter.string(from: Date())) \(Int(newHeading.trueHeading))º\n"
-            Str_TV_Heading = Str_FileSave_singleItem!.appending(Str_TV_Heading!)  //可以通过种类来调节倒序还是正序显示
-            
-            self.TextView_Heading.text = Str_TV_Heading
- 
-            let tempDateFormate = dateFormatter.dateFormat
-            dateFormatter.dateFormat = "yyyy-MM-dd"
-            Str_FileSave_fileName = self.dateFormatter.string(from: Date())
-            Str_FileSave_fullDirect = "\(Str_FileSave_HomePathWithDocuments!)\(Str_FileSave_fileName!)\(Str_FileSave_suffix!)"
-            dateFormatter.dateFormat = tempDateFormate
-//            print("测试最终生成的文件路径\(Str_FileSave_fullDirect!)")
-            
-            do{ //添加了文件读写时用到的追加模式
-                if !fileManager.fileExists(atPath: Str_FileSave_fullDirect!) {
-                    try! Str_TV_Heading?.write(toFile: Str_FileSave_fullDirect!, atomically: true, encoding: .utf8)
-                }else
-                {
-                  try!  fileHandle = FileHandle.init(forUpdating: URL.init(string: Str_FileSave_fullDirect!)!)
-                    fileHandle?.seekToEndOfFile()
-                    let tempData = Str_FileSave_singleItem.data(using: .utf8)
-                    fileHandle?.write(tempData!)
-                    fileHandle?.closeFile()
-                }
-            
-            }catch{ }
-            
-            ViewController.changedValue = 0
-        }
-        self.currentHeading = newHeading.trueHeading
+//        ViewController.changedValue += abs(Int(newHeading.trueHeading - self.currentHeading))  ////////这个是用来控制变动范围的 目前暂时弃用
+                self.currentHeading = newHeading.trueHeading //把newHeading传出去 让currentHeading作为当前方向
     }
     
     //MARK:-
@@ -214,6 +183,41 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         
         self.Label_x.text = "\((currentAcceleration!.z).format(f: ".2"))"
         self.Label_y.text = "\((currentHeading).format(f: ".2"))"
+        
+        
+        
+//        if ViewController.changedValue > HEADINGLIMIT  ////////这个是用来控制变动范围的 目前暂时弃用
+//        {                                                                               ////////这个是用来控制变动范围的 目前暂时弃用
+            Str_FileSave_singleItem = "\(self.dateFormatter.string(from: Date())) \(Int(currentHeading))º\n"
+            Str_TV_Heading = Str_FileSave_singleItem!.appending(Str_TV_Heading!)  //可以通过种类来调节倒序还是正序显示
+            
+            self.TextView_Heading.text = Str_TV_Heading
+            
+            let tempDateFormate = dateFormatter.dateFormat
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            Str_FileSave_fileName = self.dateFormatter.string(from: Date())
+            Str_FileSave_fullDirect = "\(Str_FileSave_HomePathWithDocuments!)\(Str_FileSave_fileName!)\(Str_FileSave_suffix!)"
+            dateFormatter.dateFormat = tempDateFormate
+            //            print("测试最终生成的文件路径\(Str_FileSave_fullDirect!)")
+            
+            do{ //添加了文件读写时用到的追加模式
+                if !fileManager.fileExists(atPath: Str_FileSave_fullDirect!) {
+                    try! Str_TV_Heading?.write(toFile: Str_FileSave_fullDirect!, atomically: true, encoding: .utf8)
+                }else
+                {
+                    try!  fileHandle = FileHandle.init(forUpdating: URL.init(string: Str_FileSave_fullDirect!)!)
+                    fileHandle?.seekToEndOfFile()
+                    let tempData = Str_FileSave_singleItem!.data(using: .utf8)
+                    fileHandle?.write(tempData!)
+                    fileHandle?.closeFile()
+                }
+                
+            }catch{ }
+            
+//            ViewController.changedValue = 0  ////////这个是用来控制变动范围的 目前暂时弃用
+//        }                                                       ////////这个是用来控制变动范围的 目前暂时弃用
+
+        
         
         
 //        let b=3.223
