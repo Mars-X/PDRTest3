@@ -27,10 +27,13 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     
     var currentPosition:CGPoint = CGPoint.init(x: 0, y: 0)
     
-    /////////各种管理器
+    /////////运动检测相关
     var locationManage:CLLocationManager = CLLocationManager.init()
-    let fileManager = FileManager.default
     let motionManager:CMMotionManager = CMMotionManager.init()
+
+    ///////////文件操作相关
+    let fileManager = FileManager.default
+    var fileHandle:FileHandle? = nil
     
     ////////数据采集器
     let pedometer = CMPedometer.init()
@@ -172,7 +175,6 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
             
             self.TextView_Heading.text = Str_TV_Heading
  
-            
             let tempDateFormate = dateFormatter.dateFormat
             dateFormatter.dateFormat = "yyyy-MM-dd"
             Str_FileSave_fileName = self.dateFormatter.string(from: Date())
@@ -180,8 +182,18 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
             dateFormatter.dateFormat = tempDateFormate
 //            print("测试最终生成的文件路径\(Str_FileSave_fullDirect!)")
             
-            do{
-            try! Str_TV_Heading?.write(toFile: Str_FileSave_fullDirect!, atomically: true, encoding: .utf8)
+            do{ //添加了文件读写时用到的追加模式
+                if !fileManager.fileExists(atPath: Str_FileSave_fullDirect!) {
+                    try! Str_TV_Heading?.write(toFile: Str_FileSave_fullDirect!, atomically: true, encoding: .utf8)
+                }else
+                {
+                  try!  fileHandle = FileHandle.init(forUpdating: URL.init(string: Str_FileSave_fullDirect!)!)
+                    fileHandle?.seekToEndOfFile()
+                    let tempData = Str_TV_Heading?.data(using: .utf8)
+                    fileHandle?.write(tempData!)
+                    fileHandle?.closeFile()
+                }
+            
             }catch{ }
             
             ViewController.changedValue = 0
