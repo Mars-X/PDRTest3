@@ -23,6 +23,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 //MARK:全局变量、常量
     /////宏
     let HEADINGLIMIT = 50 //超过这个值时保存记录
+    let TIMEINTERVAL = 0.1    //获取数据的时间间隔
     
     var currentPosition:CGPoint = CGPoint.init(x: 0, y: 0)
     
@@ -133,7 +134,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 //            })//end of closure
             if (self.timer == nil)
             {
-                timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+                timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.TIMEINTERVAL), target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
             }
             
             var tempQueue = OperationQueue.init()
@@ -188,21 +189,27 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         self.currentHeading = newHeading.trueHeading
     }
     
-//    func calculation() -> CGPoint {
-////        currentPosition.
-//        
-//    }
-    
     //MARK:-
     //MARK:自定义方法
     func timerAction()
     {
 //        print("1")
 //        self.Int_Timer_currentSecond = self.Int_Timer_currentSecond + 1
-        self.Label_x.text = "\(Int((currentAcceleration!.z)))"
-        self.Label_y.text = "\(Int((currentHeading)))"
+//        self.Label_x.text = "\(Int((currentAcceleration!.z)))"
+//        self.Label_y.text = "\(Int((currentHeading)))"
+        
+        self.Label_x.text = "\((currentAcceleration!.z).format(f: ".2"))"
+        self.Label_y.text = "\((currentHeading).format(f: ".2"))"
+        
+        
+//        let b=3.223
+//        let f = ".2"
+//        print("double:\(b.format(f: f))")
 
     }
+ 
+    
+    
     
 }
 

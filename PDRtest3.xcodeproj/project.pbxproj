@@ -14,6 +14,7 @@
 		8CF556BB1E7B7A0D00C77C64 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8CF556B91E7B7A0D00C77C64 /* LaunchScreen.storyboard */; };
 		8CF556C61E7B7A0D00C77C64 /* PDRtest3Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF556C51E7B7A0D00C77C64 /* PDRtest3Tests.swift */; };
 		8CF556D11E7B7A0E00C77C64 /* PDRtest3UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF556D01E7B7A0E00C77C64 /* PDRtest3UITests.swift */; };
+		8CF5571F1E7FD20200C77C64 /* DoubleFormater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF5571E1E7FD20100C77C64 /* DoubleFormater.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		8CF556CC1E7B7A0E00C77C64 /* PDRtest3UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PDRtest3UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CF556D01E7B7A0E00C77C64 /* PDRtest3UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDRtest3UITests.swift; sourceTree = "<group>"; };
 		8CF556D21E7B7A0E00C77C64 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8CF5571E1E7FD20100C77C64 /* DoubleFormater.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleFormater.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 			children = (
 				8CF556B01E7B7A0D00C77C64 /* AppDelegate.swift */,
 				8CF556B21E7B7A0D00C77C64 /* ViewController.swift */,
+				8CF5571E1E7FD20100C77C64 /* DoubleFormater.swift */,
 				8CF556B41E7B7A0D00C77C64 /* Main.storyboard */,
 				8CF556B71E7B7A0D00C77C64 /* Assets.xcassets */,
 				8CF556B91E7B7A0D00C77C64 /* LaunchScreen.storyboard */,
@@ -263,6 +266,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8CF556B31E7B7A0D00C77C64 /* ViewController.swift in Sources */,
+				8CF5571F1E7FD20200C77C64 /* DoubleFormater.swift in Sources */,
 				8CF556B11E7B7A0D00C77C64 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
