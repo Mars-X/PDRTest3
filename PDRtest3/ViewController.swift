@@ -156,8 +156,11 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     //////停止更新Btn
     @IBAction func Btn_Action_Stop(_ sender: Any) {
         self.motionManager.stopAccelerometerUpdates()
-//        self.pedometer.stopUpdates()
+//        self.pedometer.stopUpdates()//暂时弃用 因为不再使用ios sdk提供的距离测量
         self.locationManage.stopUpdatingHeading()
+        self.timer?.invalidate()
+        self.timer = nil
+        
     }
     
     //MARK:-
@@ -181,14 +184,14 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 //        self.Label_x.text = "\(Int((currentAcceleration!.z)))"
 //        self.Label_y.text = "\(Int((currentHeading)))"
         
-        self.Label_x.text = "\((currentAcceleration!.z).format(f: ".2"))"
-        self.Label_y.text = "\((currentHeading).format(f: ".2"))"
+//        self.Label_x.text = "\((currentAcceleration!.z).format(f: ".2"))
+//        self.Label_y.text = "\((currentHeading).format(f: ".2"))"
         
-        
+        self.TextView_Distance.text = "\((currentAcceleration!.z).format(f: ".2"))\n".appending(self.TextView_Distance.text)
         
 //        if ViewController.changedValue > HEADINGLIMIT  ////////这个是用来控制变动范围的 目前暂时弃用
 //        {                                                                               ////////这个是用来控制变动范围的 目前暂时弃用
-            Str_FileSave_singleItem = "\(self.dateFormatter.string(from: Date())) \(Int(currentHeading))º\n"
+            Str_FileSave_singleItem = "\(self.dateFormatter.string(from: Date())) || \(currentHeading.format(f: ".2"))º || \((currentAcceleration!.z).format(f: ".2"))\n" //调整单条记录格式
             Str_TV_Heading = Str_FileSave_singleItem!.appending(Str_TV_Heading!)  //可以通过种类来调节倒序还是正序显示
             
             self.TextView_Heading.text = Str_TV_Heading
@@ -219,10 +222,6 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 
         
         
-        
-//        let b=3.223
-//        let f = ".2"
-//        print("double:\(b.format(f: f))")
 
     }
  
