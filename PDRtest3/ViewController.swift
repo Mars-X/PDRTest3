@@ -64,6 +64,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     var Str_FileSave_fileName:String? = ""  //这个文件名可以设置为当前日期
     let Str_FileSave_suffix:String? = ".txt"
     var Str_FileSave_fullDirect:String? = ""    //用于存储文件最终生成的路径
+    var Str_FileSave_singleItem:String? = ""    //保存构造的单独一条记录 可以在文件追加时候直接保存进去就好了
     
     //////////////计时器
     var timer:Timer? = nil
@@ -171,7 +172,8 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         
         if ViewController.changedValue > HEADINGLIMIT
         {
-            Str_TV_Heading = "\(self.dateFormatter.string(from: Date())) \(Int(newHeading.trueHeading))º\n".appending(Str_TV_Heading!)
+            Str_FileSave_singleItem = "\(self.dateFormatter.string(from: Date())) \(Int(newHeading.trueHeading))º\n"
+            Str_TV_Heading = Str_FileSave_singleItem!.appending(Str_TV_Heading!)  //可以通过种类来调节倒序还是正序显示
             
             self.TextView_Heading.text = Str_TV_Heading
  
@@ -189,7 +191,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
                 {
                   try!  fileHandle = FileHandle.init(forUpdating: URL.init(string: Str_FileSave_fullDirect!)!)
                     fileHandle?.seekToEndOfFile()
-                    let tempData = Str_TV_Heading?.data(using: .utf8)
+                    let tempData = Str_FileSave_singleItem.data(using: .utf8)
                     fileHandle?.write(tempData!)
                     fileHandle?.closeFile()
                 }
