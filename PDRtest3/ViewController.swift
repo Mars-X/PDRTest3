@@ -235,7 +235,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         
         backID = UIApplication.shared.beginBackgroundTask {
             NSLog("进入后台")
-           
+           self.locationManage.startUpdatingLocation()//只是用来维持后台更新
             self.timer?.invalidate()
             self.timer = nil
             if (self.timer == nil)
