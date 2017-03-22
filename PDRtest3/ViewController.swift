@@ -23,7 +23,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 //MARK:全局变量、常量
     /////宏
     let HEADINGLIMIT = 50 //超过这个值时保存记录
-    let TIMEINTERVAL = 1    //获取数据的时间间隔
+    let TIMEINTERVAL = 0.2    //获取数据的时间间隔
     
     var currentPosition:CGPoint = CGPoint.init(x: 0, y: 0)
     
@@ -70,6 +70,8 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     var timer:Timer? = nil
     var Int_Timer_currentSecond = 0
     
+    /////////////后台运行相关
+    var backID = UIBackgroundTaskInvalid
     
 //MARK:-
 //MARK: 初始化函数
@@ -92,6 +94,8 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         ///////////////设置代理
         self.locationManage.delegate = self
 
+        ///////////////后台运行
+        NotificationCenter.default.addObserver(self, selector: Selector("applicationEnterBackground"), name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
         
         //////////输出测试语句
        // print(Str_FileSave_HomePathWithDocuments!)
@@ -225,7 +229,18 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 
     }
  
-    
+    func applicationEnterBackground() {
+//        print("执行了这个进入后台的方法 但是没有开始计时")//如果不申请下面的后台执行 那么很快就结束了
+        
+        backID = UIApplication.shared.beginBackgroundTask {
+            NSLog("进入后台")
+//            self.timerAction()
+            //            UIApplication.shared.endBackgroundTask(self.backID)
+            
+            //            self.backID = UIBackgroundTaskInvalid
+            //            self.                      timer = nil
+        }
+    }
     
     
 }
