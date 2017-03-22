@@ -73,6 +73,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     /////////////后台运行相关
     var backID = UIBackgroundTaskInvalid
     
+    
 //MARK:-
 //MARK: 初始化函数
     override func viewDidLoad() {
@@ -234,6 +235,16 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         
         backID = UIApplication.shared.beginBackgroundTask {
             NSLog("进入后台")
+           
+            self.timer?.invalidate()
+            self.timer = nil
+            if (self.timer == nil)
+            {
+//                NSLog("开始了新的计时器")
+                self.Label_x.text = "开始了新的计时器"
+                self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.TIMEINTERVAL), target: self, selector: #selector(self.timerAction), userInfo: nil, repeats: true)
+            }
+
 //            self.timerAction()
             //            UIApplication.shared.endBackgroundTask(self.backID)
             
