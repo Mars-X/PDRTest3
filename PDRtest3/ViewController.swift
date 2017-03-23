@@ -70,7 +70,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     var timer:Timer? = nil
     var Int_Timer_currentSecond = 0
     
-    var timerForBG:Timer? = nil
+
     
     /////////////后台运行相关
     var backID = UIBackgroundTaskInvalid
@@ -78,8 +78,10 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     
 //    var bgTaskIdList : NSMutableArray?  //
     var bgTaskIdList :[UIBackgroundTaskIdentifier]? = []
-    var masterTaskId : UIBackgroundTaskIdentifier?
-
+    var bgTaskIdList2:NSMutableArray = NSMutableArray.init()
+    var masterTaskId : UIBackgroundTaskIdentifier? = UIBackgroundTaskInvalid
+    var timerForBG:Timer? = nil
+    var timerForBGDelay10second:Timer? = nil
     
 //MARK:-
 //MARK: 初始化函数
@@ -94,17 +96,27 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         self.Label_x.text = String(describing: currentPosition.x)
         self.Label_y.text = String(describing: currentPosition.y)
         
+        //////////////授权
+        self.locationManage.requestAlwaysAuthorization()
+        
+        
         /////////////////初始化管理器
 //        dateFormatter.dateStyle = .medium
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         dateFormatter.locale = Locale.current
         
+        
+        
         ///////////////设置代理
         self.locationManage.delegate = self
 
+
+        
         ///////////////后台运行
         NotificationCenter.default.addObserver(self, selector: Selector("applicationEnterBackground"), name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
         
+        
+
         //////////输出测试语句
        // print(Str_FileSave_HomePathWithDocuments!)
 
@@ -187,13 +199,56 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
                 self.currentHeading = newHeading.trueHeading //把newHeading传出去 让currentHeading作为当前方向
     }
     
+   
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         NSLog("调用location的update方法")
+        
+        
+        if self.timerForBG != nil {
+            return
+        }
+        
         self.actBackground()
+        
+        self.timerForBG = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(restartUpdating), userInfo: nil, repeats: false)
+        
+       if self.timerForBGDelay10second != nil
+        {
+            self.timerForBGDelay10second?.invalidate()
+            self.timerForBGDelay10second = nil
+        }
+        
+        self.timerForBGDelay10second = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(stopUpdating), userInfo: nil, repeats: false)
     }
+    
     
     //MARK:-
     //MARK:自定义方法
+    
+    func stopUpdating()
+    {
+
+        if timerForBG != nil {
+            timerForBG?.invalidate()
+            timerForBG = nil
+        }
+        
+        self.locationManage.stopUpdatingLocation()
+        NSLog("locationManager stop Updating after 10 seconds");
+    }
+    
+    func restartUpdating()
+    {
+        if timerForBG != nil {
+            timerForBG?.invalidate()
+            timerForBG = nil
+        }
+        
+        self.locationManage.startUpdatingLocation()
+    }
+    
+    
     func timerAction()
     {
 //        print("1")
@@ -242,8 +297,24 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     }
  
     func applicationEnterBackground() {
-         self.locationManage.startUpdatingLocation()//只是用来维持后台更新  //似乎没有作用
+        NSLog("已进入后台")
+        self.locationManage.startUpdatingLocation()//
+        
+       self.actBackground()
+        
+//        if timerForBG == nil {
+//            timerForBG = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(go), userInfo: nil, repeats: true)
+//        }
+
+        
     }
+    
+//    func go()
+//    {
+//        //        NSLog("%@ == %d", Date(),aa)
+//        print("\(Date())==\(aa)")
+//        aa += 1
+//    }
     
     func actBackground() {
         //        print("执行了这个进入后台的方法 但是没有开始计时")//如果不申请下面的后台执行 那么很快就结束了
@@ -291,30 +362,82 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         
         let application : UIApplication = UIApplication.shared
         var bgTaskId : UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+//        NSLog("%@", bgTaskId)
         //        self.locationManage.startUpdatingLocation()
 
-        if application.responds(to: Selector("beginBackgroundTaskWithExpirationHandler")){
-            print("RESPONDS TO SELECTOR")
+//        if application.responds(to: Selector("beginBackgroundTaskWithExpirationHandler")){
+//            if application.responds(to: #selector("beginBackgroundTask(expirationHandler:)") {
+//            print("RESPONDS TO SELECTOR")
+
             bgTaskId = application.beginBackgroundTask(expirationHandler: {
                 print("background task \(bgTaskId as Int) expired\n")
-                self.timer = nil
+//                 self.bgTaskIdList?.remove(at: bgTaskId)
+//                self.bgTaskIdList2.removeObject(at: bgTaskId)
+//                self.bgTaskIdList?.remove(at: bgTaskId)
+                self.bgTaskIdList?.removeFirst()                        //这里面 就没打算让它执行。
+                application.endBackgroundTask(bgTaskId)
+                bgTaskId = UIBackgroundTaskInvalid;
             })
-        }
+//        }
         
         if self.masterTaskId == UIBackgroundTaskInvalid {
             self.masterTaskId = bgTaskId
-            print("started master task \(self.masterTaskId)\n")
+            print("started master task \(self.masterTaskId!)\n")    //这个就计划执行以此 把第一次的task存入master中
         } else {
             // add this ID to our list
             print("started background task \(bgTaskId as Int)\n")
             self.bgTaskIdList!.append(bgTaskId)
+//            self.bgTaskIdList2.add(bgTaskId)
             //self.endBackgr
-        }
+            //////////////////////
+            self.endBackgroundTasks()
+//        }
         
-        if (self.timer == nil)
-        {
-            self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.TIMEINTERVAL), target: self, selector: #selector(self.timerAction), userInfo: nil, repeats: true)
-        }
+//        if (self.timer == nil)
+//        {
+//            NSLog("这里似乎没有执行")
+//            self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.TIMEINTERVAL), target: self, selector: #selector(self.timerAction), userInfo: nil, repeats: true)
+//        }
+            
     }
+}
+    
+    func endBackgroundTasks() {
+        self.drainBGTaskList(all: false)
+    }
+    
+    
+    func drainBGTaskList(all:Bool)
+    {
+        let application:UIApplication = UIApplication.shared
+//        if application .responds(to: #selector(endBackgroundTasks)) {
+            var count = self.bgTaskIdList?.count
+//            var count = self.bgTaskIdList2.count
+            var i = 1 //x先只考虑False的情况
+            while i < count! {
+//                var bgTaskId:UIBackgroundTaskIdentifier = Int(self.bgTaskIdList![0])
+                var bgTaskId:UIBackgroundTaskIdentifier = (self.bgTaskIdList![0] as AnyObject).intValue
+                NSLog("ending background task with id %lu", bgTaskId)
+                application.endBackgroundTask(bgTaskId)
+//                bgTaskIdList?.remove(at: 0)
+                bgTaskIdList?.removeFirst()
+                
+//                bgTaskIdList2.removeObject(at: 0)
+                i += 1
+            }
+            
+            if (self.bgTaskIdList?.count)! > 0 {
+                NSLog("kept background task id %@", self.bgTaskIdList![0]);
+            }
+            
+            
+            NSLog("kept master background task id %lu", self.masterTaskId!);
+
+            
+//        }
+    }
+
+
+    
 }//end of class
 
