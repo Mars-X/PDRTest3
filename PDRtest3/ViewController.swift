@@ -70,9 +70,16 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     var timer:Timer? = nil
     var Int_Timer_currentSecond = 0
     
+    var timerForBG:Timer? = nil
+    
     /////////////后台运行相关
     var backID = UIBackgroundTaskInvalid
+    var aa = 0
     
+//    var bgTaskIdList : NSMutableArray?  //
+    var bgTaskIdList :[UIBackgroundTaskIdentifier]? = []
+    var masterTaskId : UIBackgroundTaskIdentifier?
+
     
 //MARK:-
 //MARK: 初始化函数
@@ -180,6 +187,11 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
                 self.currentHeading = newHeading.trueHeading //把newHeading传出去 让currentHeading作为当前方向
     }
     
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        NSLog("调用location的update方法")
+        self.actBackground()
+    }
+    
     //MARK:-
     //MARK:自定义方法
     func timerAction()
@@ -227,32 +239,82 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 
         
         
-
     }
  
     func applicationEnterBackground() {
-//        print("执行了这个进入后台的方法 但是没有开始计时")//如果不申请下面的后台执行 那么很快就结束了
-        
-        backID = UIApplication.shared.beginBackgroundTask {
-            NSLog("进入后台")
-           self.locationManage.startUpdatingLocation()//只是用来维持后台更新
-            self.timer?.invalidate()
-            self.timer = nil
-            if (self.timer == nil)
-            {
-//                NSLog("开始了新的计时器")
-                self.Label_x.text = "开始了新的计时器"
-                self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.TIMEINTERVAL), target: self, selector: #selector(self.timerAction), userInfo: nil, repeats: true)
-            }
-
-//            self.timerAction()
-            //            UIApplication.shared.endBackgroundTask(self.backID)
-            
-            //            self.backID = UIBackgroundTaskInvalid
-            //            self.                      timer = nil
-        }
+         self.locationManage.startUpdatingLocation()//只是用来维持后台更新  //似乎没有作用
     }
     
-    
-}
+    func actBackground() {
+        //        print("执行了这个进入后台的方法 但是没有开始计时")//如果不申请下面的后台执行 那么很快就结束了
+        /*
+         backID = UIApplication.shared.beginBackgroundTask {
+         NSLog("进入后台")
+
+         //            self.timer?.invalidate()
+         //            self.timer = nil
+         //            if (self.timer == nil)
+         //            {
+         ////                NSLog("开始了新的计时器")
+         //                self.Label_x.text = "开始了新的计时器"
+         //                self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.TIMEINTERVAL), target: self, selector: #selector(self.timerAction), userInfo: nil, repeats: true)
+         //            }
+         
+         //            UIApplication.shared.endBackgroundTask(self.backID)
+         
+         //            self.backID = UIBackgroundTaskInvalid
+         //            self.                      timer = nil
+         }
+         
+         if timerForBG == nil {
+         timerForBG = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(go), userInfo: nil, repeats: true)
+         }
+         
+         
+         }
+         
+         func go()
+         {
+         //        NSLog("%@ == %d", Date(),aa)
+         print("\(Date())==\(aa)")
+         aa += 1
+         }
+         */
+        
+        
+        //        print("开始了新的后台时间")
+        
+        
+        //        if timerForBG == nil {
+        //            timerForBG = Timer.scheduledTimer(timeInterval: 120, target: self, selector: #selector(applicationEnterBackground), userInfo: nil, repeats: true)
+        //        }
+        
+        let application : UIApplication = UIApplication.shared
+        var bgTaskId : UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+        //        self.locationManage.startUpdatingLocation()
+
+        if application.responds(to: Selector("beginBackgroundTaskWithExpirationHandler")){
+            print("RESPONDS TO SELECTOR")
+            bgTaskId = application.beginBackgroundTask(expirationHandler: {
+                print("background task \(bgTaskId as Int) expired\n")
+                self.timer = nil
+            })
+        }
+        
+        if self.masterTaskId == UIBackgroundTaskInvalid {
+            self.masterTaskId = bgTaskId
+            print("started master task \(self.masterTaskId)\n")
+        } else {
+            // add this ID to our list
+            print("started background task \(bgTaskId as Int)\n")
+            self.bgTaskIdList!.append(bgTaskId)
+            //self.endBackgr
+        }
+        
+        if (self.timer == nil)
+        {
+            self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.TIMEINTERVAL), target: self, selector: #selector(self.timerAction), userInfo: nil, repeats: true)
+        }
+    }
+}//end of class
 
