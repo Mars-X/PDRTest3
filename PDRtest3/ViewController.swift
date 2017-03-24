@@ -99,6 +99,18 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         //////////////授权
         self.locationManage.requestAlwaysAuthorization()
         
+        self.locationManage.pausesLocationUpdatesAutomatically = false
+        self.locationManage.allowsBackgroundLocationUpdates = true
+//        
+//        self.locMgr.pausesLocationUpdatesAutomatically=NO;
+//        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8) {
+//            //[_locationManager requestWhenInUseAuthorization];
+//            [self.locMgr requestAlwaysAuthorization];
+//        }
+//        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 9) {
+//            self.locMgr.allowsBackgroundLocationUpdates = YES;
+//        }
+        
         
         /////////////////初始化管理器
 //        dateFormatter.dateStyle = .medium
@@ -115,7 +127,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         ///////////////后台运行
         NotificationCenter.default.addObserver(self, selector: Selector("applicationEnterBackground"), name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
         
-        
+        self.locationManage.startUpdatingLocation()
 
         //////////输出测试语句
        // print(Str_FileSave_HomePathWithDocuments!)
@@ -229,10 +241,10 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     func stopUpdating()
     {
 
-        if timerForBG != nil {
-            timerForBG?.invalidate()
-            timerForBG = nil
-        }
+//        if timerForBG != nil {
+//            timerForBG?.invalidate()
+//            timerForBG = nil
+//        }
         
         self.locationManage.stopUpdatingLocation()
         NSLog("locationManager stop Updating after 10 seconds");
@@ -369,12 +381,17 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 //            if application.responds(to: #selector("beginBackgroundTask(expirationHandler:)") {
 //            print("RESPONDS TO SELECTOR")
 
+        
+        
+
+        
+        
             bgTaskId = application.beginBackgroundTask(expirationHandler: {
                 print("background task \(bgTaskId as Int) expired\n")
 //                 self.bgTaskIdList?.remove(at: bgTaskId)
 //                self.bgTaskIdList2.removeObject(at: bgTaskId)
 //                self.bgTaskIdList?.remove(at: bgTaskId)
-                self.bgTaskIdList?.removeFirst()                        //这里面 就没打算让它执行。
+//                self.bgTaskIdList?.removeFirst()                        //这里面 就没打算让它执行。
                 application.endBackgroundTask(bgTaskId)
                 bgTaskId = UIBackgroundTaskInvalid;
             })
@@ -411,12 +428,12 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     {
         let application:UIApplication = UIApplication.shared
 //        if application .responds(to: #selector(endBackgroundTasks)) {
-            var count = self.bgTaskIdList?.count
+            let count = self.bgTaskIdList?.count
 //            var count = self.bgTaskIdList2.count
             var i = 1 //x先只考虑False的情况
             while i < count! {
 //                var bgTaskId:UIBackgroundTaskIdentifier = Int(self.bgTaskIdList![0])
-                var bgTaskId:UIBackgroundTaskIdentifier = (self.bgTaskIdList![0] as AnyObject).intValue
+                let bgTaskId:UIBackgroundTaskIdentifier = (self.bgTaskIdList![0] as AnyObject).intValue
                 NSLog("ending background task with id %lu", bgTaskId)
                 application.endBackgroundTask(bgTaskId)
 //                bgTaskIdList?.remove(at: 0)
@@ -427,7 +444,8 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
             }
             
             if (self.bgTaskIdList?.count)! > 0 {
-                NSLog("kept background task id %@", self.bgTaskIdList![0]);
+//                NSLog("kept background task id %@", self.bgTaskIdList![0]);
+                print("kept background task id \(self.bgTaskIdList![0])")
             }
             
             
