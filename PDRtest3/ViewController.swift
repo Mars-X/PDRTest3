@@ -19,11 +19,13 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     @IBOutlet weak var TextView_Heading: UITextView!
     @IBOutlet weak var Label_x: UILabel!
     @IBOutlet weak var Label_y: UILabel!
+    @IBOutlet weak var Label_StepCount: UILabel!
     
 //MARK:全局变量、常量
     /////宏
     let HEADINGLIMIT = 50 //超过这个值时保存记录
     let TIMEINTERVAL = 0.2    //获取数据的时间间隔
+    let STEPTIME = 3
     
     var currentPosition:CGPoint = CGPoint.init(x: 0, y: 0)
     
@@ -69,8 +71,12 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     //////////////计时器
     var timer:Timer? = nil
     var Int_Timer_currentSecond = 0
+    var timerForStepCount:Timer? = nil
     
-
+    //全局变量
+    var calACC:Double = 0.0
+    var stepCount:Int = 0
+    var calACC_Array:[Double] = [Double]()
     
     /////////////后台运行相关
     var backID = UIBackgroundTaskInvalid
@@ -175,6 +181,9 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
             if (self.timer == nil)
             {
                 timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.TIMEINTERVAL), target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+                //MARK:计步器时间
+                timerForStepCount = Timer.scheduledTimer(timeInterval: TimeInterval(self.STEPTIME), target: self, selector: #selector(timerActionForStepCount), userInfo: nil, repeats: true)
+                
             }
             
             var tempQueue = OperationQueue.init()
@@ -248,6 +257,14 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         
         self.locationManage.stopUpdatingLocation()
         NSLog("locationManager stop Updating after 10 seconds");
+//        timer?.invalidate()
+//        timer = nil
+//        timerForBG?.invalidate()
+//        timerForBG = nil
+//        timerForStepCount?.invalidate()
+//        timerForStepCount = nil
+//        timerForBGDelay10second?.invalidate()
+//        timerForBGDelay10second = nil
     }
     
     func restartUpdating()
@@ -271,11 +288,21 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 //        self.Label_x.text = "\((currentAcceleration!.z).format(f: ".2"))
 //        self.Label_y.text = "\((currentHeading).format(f: ".2"))"
         
-        self.TextView_Distance.text = "\((currentAcceleration!.z).format(f: ".2"))\n".appending(self.TextView_Distance.text)
+        
+        pow(currentAcceleration!.z,2.0)
+        pow(currentAcceleration!.x,2.0)
+        pow(currentAcceleration!.y,2.0)
+        //只用z轴改成求模
+        calACC = 9.8 * sqrt(pow(currentAcceleration!.z,2.0) + pow(currentAcceleration!.x,2.0) + pow(currentAcceleration!.y,2.0))
+        calACC_Array.append(calACC)
+
+        
+        
+        self.TextView_Distance.text = "\((calACC).format(f: ".2"))\n".appending(self.TextView_Distance.text)
         
 //        if ViewController.changedValue > HEADINGLIMIT  ////////这个是用来控制变动范围的 目前暂时弃用
 //        {                                                                               ////////这个是用来控制变动范围的 目前暂时弃用
-            Str_FileSave_singleItem = "\(self.dateFormatter.string(from: Date())) || \(currentHeading.format(f: ".2"))º || \((currentAcceleration!.z).format(f: ".2"))\n" //调整单条记录格式
+            Str_FileSave_singleItem = "\(self.dateFormatter.string(from: Date())) || \(currentHeading.format(f: ".2"))º || \((calACC).format(f: ".2"))\n" //调整单条记录格式
             Str_TV_Heading = Str_FileSave_singleItem!.appending(Str_TV_Heading!)  //可以通过种类来调节倒序还是正序显示
             
             self.TextView_Heading.text = Str_TV_Heading
@@ -304,6 +331,45 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 //            ViewController.changedValue = 0  ////////这个是用来控制变动范围的 目前暂时弃用
 //        }                                                       ////////这个是用来控制变动范围的 目前暂时弃用
 
+        
+        
+        
+        /////MARK:-
+ 
+        
+        /////MARK:-
+        
+        
+    }
+    
+    //MARK: 计步器时间函数
+    func timerActionForStepCount()
+    {
+
+        if calACC_Array.count >= STEPTIME*5
+        {
+            var current = calACC_Array[0]
+            var last = calACC_Array[0]
+
+            print("可以分析了cout:\(calACC_Array.count)")
+            var max = calACC_Array[0]
+            var min = calACC_Array[0]
+            for item in calACC_Array
+            {
+                current = item
+                if current - last > 2.5
+                {
+                    stepCount += 1
+                    print("走了\(stepCount)步")
+//                    var distanceCount = stepCount *
+                    Label_StepCount.text = "走了\(stepCount)步,大概\(Double(stepCount)*0.45)米"
+                }
+
+            }
+
+            calACC_Array.removeAll()
+            
+        }
         
         
     }
