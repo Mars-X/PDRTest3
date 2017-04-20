@@ -25,7 +25,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     /////宏
     let HEADINGLIMIT = 50 //超过这个值时保存记录
     let TIMEINTERVAL = 0.2    //获取数据的时间间隔
-    let STEPTIME = 3
+    let STEPTIME = 0.6//方法2：0.6//方法1：3.0  //1.65??
     
     var currentPosition:CGPoint = CGPoint.init(x: 0, y: 0)
     
@@ -77,7 +77,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     var calACC:Double = 0.0
     var stepCount:Int = 0
     var calACC_Array:[Double] = [Double]()
-    
+    var calHeading_Array:[Double] = [Double]()
     /////////////后台运行相关
     var backID = UIBackgroundTaskInvalid
     var aa = 0
@@ -88,6 +88,13 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     var masterTaskId : UIBackgroundTaskIdentifier? = UIBackgroundTaskInvalid
     var timerForBG:Timer? = nil
     var timerForBGDelay10second:Timer? = nil
+    
+    struct coornidate {
+        var x:Double = 0.0
+        var y:Double = 0.0
+    }
+    
+    var localCoornidate : coornidate = coornidate()
     
 //MARK:-
 //MARK: 初始化函数
@@ -218,6 +225,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         
 //        ViewController.changedValue += abs(Int(newHeading.trueHeading - self.currentHeading))  ////////这个是用来控制变动范围的 目前暂时弃用
                 self.currentHeading = newHeading.trueHeading //把newHeading传出去 让currentHeading作为当前方向
+        self.calHeading_Array.append(self.currentHeading)
     }
     
    
@@ -343,29 +351,70 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     }
     
     //MARK: 计步器时间函数
+    /////方法1
     func timerActionForStepCount()
     {
-
-        if calACC_Array.count >= STEPTIME*5
+        var switch_Step = true //计步的开关 设想就是每3秒大概走1步 不能再多了？
+        var countStep_thisloop = 0
+        var currentSub = 0.0//相隔几个
+        var last = 9.8
+        if Double(calACC_Array.count) >= STEPTIME*5.0
         {
             var current = calACC_Array[0]
-            var last = calACC_Array[0]
 
-            print("可以分析了cout:\(calACC_Array.count)")
-            var max = calACC_Array[0]
-            var min = calACC_Array[0]
-            for item in calACC_Array
+
+//            print("可以分析了cout:\(calACC_Array.count)")
+//            var max = calACC_Array[0]
+//            var min = calACC_Array[0]
+            var i = 0
+            while i < calACC_Array.count
             {
-                current = item
-                if current - last > 2.5
+                current = calACC_Array[i]
+                
+                if (current - last > 2.5)//&&(countStep_thisloop < 10) //每3秒最多走3步
                 {
                     stepCount += 1
+                    countStep_thisloop += 1
                     print("走了\(stepCount)步")
-//                    var distanceCount = stepCount *
+                    //                    var distanceCount = stepCount *
                     Label_StepCount.text = "走了\(stepCount)步,大概\(Double(stepCount)*0.45)米"
+                    
+                    Label_x.text = "\(self.localCoornidate.x+0.45)"
+                    Label_y.text = "\(self.localCoornidate.y+0.45)"
+                    print("current:\(current.format(f: ".2")),last:\(last.format(f: ".2"))")
+                    //                    switch_Step = false
                 }
-
+                //                last = current
+//                if i > 10
+//                {
+//                    last = calACC_Array[i-10]
+//                    
+//                }
+                i += 1
+                
             }
+            
+//            for item in calACC_Array
+//            {
+//                current = item
+
+//                if (current - last > 2.5)//&&(countStep_thisloop < 10) //每3秒最多走3步
+//                {
+//                    stepCount += 1
+//                    countStep_thisloop += 1
+//                    print("走了\(stepCount)步")
+////                    var distanceCount = stepCount *
+//                    Label_StepCount.text = "走了\(stepCount)步,大概\(Double(stepCount)*0.45)米"
+//                    
+//                    Label_x.text = "\(self.localCoornidate.x+0.45)"
+//                    Label_y.text = "\(self.localCoornidate.y+0.45)"
+////                    switch_Step = false
+//                }
+////                last = current
+
+//            }
+//            switch_Step = true
+            countStep_thisloop = 0
 
             calACC_Array.removeAll()
             
@@ -373,7 +422,30 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         
         
     }
- 
+    
+//        /////方法2
+//        func timerActionForStepCount()
+//        {
+//            if Double(calACC_Array.count) > STEPTIME * 5.0
+//            {
+//                var current = calACC_Array[0]
+//                var last = calACC_Array[0]
+//                var i = 0.0
+//                while i < STEPTIME * 5.0
+//                {
+//                    if calACC_Array[Int(i)] > 1.0 || calACC_Array[Int(i)] < -0.8
+//                    {
+//                            stepCount += 1
+//                            Label_StepCount.text = "走了\(stepCount)步,大概\(Double(stepCount)*0.45)米"
+//        
+//                            Label_x.text = "\(self.localCoornidate.x+0.45)"
+//                            Label_y.text = "\(self.localCoornidate.y+0.45)"
+//                        break
+//                    }
+//                }
+//                calACC_Array.removeAll()
+//            }
+//        }
     func applicationEnterBackground() {
         NSLog("已进入后台")
         self.locationManage.startUpdatingLocation()//
