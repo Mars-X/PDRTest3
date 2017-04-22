@@ -20,6 +20,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     @IBOutlet weak var Label_x: UILabel!
     @IBOutlet weak var Label_y: UILabel!
     @IBOutlet weak var Label_StepCount: UILabel!
+    @IBOutlet weak var TextView_Debug: UITextView!
     
 //MARK:全局变量、常量
     /////宏
@@ -51,6 +52,9 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     //////////////让连续的航向显示变为离散所用到的对象
     static var changedValue = 0
     var currentHeading = 0.0
+    var calHeading = 0.0
+    var lastHeading = 0.0
+    var firstRun = true
     var currentAcceleration:CMAcceleration? = CMAcceleration.init()
 
     
@@ -96,6 +100,12 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     
     var localCoornidate : coornidate = coornidate()
     
+    struct coornidate_sign{ //这个结构体用来表示符号
+        var x_sign:Bool = false
+        var y_sign:Bool = false //false表示负的
+    }
+    
+    var coornidateSign :coornidate_sign = coornidate_sign()
 //MARK:-
 //MARK: 初始化函数
     override func viewDidLoad() {
@@ -224,10 +234,33 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         self.Label_Heading.text = "\(newHeading.trueHeading)"
         
 //        ViewController.changedValue += abs(Int(newHeading.trueHeading - self.currentHeading))  ////////这个是用来控制变动范围的 目前暂时弃用
-                self.currentHeading = newHeading.trueHeading //把newHeading传出去 让currentHeading作为当前方向
+//                self.currentHeading = newHeading.trueHeading //- 25 //把newHeading传出去 让currentHeading作为当前方向
+        //注意上面的25是在课题室做实验的补偿 为了好计算距离坐标 不能在这里补偿
+        
+//        如果拿在手上 可以直接让self.currentHeading = newHeading.trueHeading
+// 这个补偿180 是放在口袋里 并且是几乎横着放的
+        if newHeading.trueHeading < 180 {
+            self.currentHeading = 360.0 + newHeading.trueHeading - 180.0
+        }
+        else
+        {
+             self.currentHeading = newHeading.trueHeading - 180.0
+        }
+//        self.currentHeading = (newHeading.trueHeading - 90).truncatingRemainder(dividingBy: 360)
         self.calHeading_Array.append(self.currentHeading)
+        
+//        if firstRun{
+//            var timerForDelay3Seconds = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(Delay3Seconds), userInfo: nil, repeats: false)
+//            lastHeading
+//        firstRun = false
+//        }
     }
     
+//    func Delay3Seconds()
+//    {
+//        //啥也不执行 只是为了静静地度过你人生中的三秒钟而已
+//    }
+//    
    
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -377,10 +410,61 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
                     countStep_thisloop += 1
                     print("走了\(stepCount)步")
                     //                    var distanceCount = stepCount *
-                    Label_StepCount.text = "走了\(stepCount)步,大概\(Double(stepCount)*0.45)米"
+                    Label_StepCount.text = "走了\(stepCount)步,行走共计约\(Double(stepCount)*0.45)米"
                     
-                    Label_x.text = "\(self.localCoornidate.x+0.45)"
-                    Label_y.text = "\(self.localCoornidate.y+0.45)"
+                    //MARK- 不知道读数中的0°怎么来的 并且可能导致前计步的行走距离是错误的
+//                    currentHeading += 25//补偿25°
+                    if abs(currentHeading - lastHeading) > 10.0 {
+                        //航向偏移了超过10° 需要重新判断方向
+//                        if currentHeading > (0.0 * M_PI )/180.0 && currentHeading <= (90.0 * M_PI)/180.0
+                      if currentHeading > 0.0 && currentHeading <= 90.0
+                        {
+                            calHeading = currentHeading
+                            coornidateSign.x_sign = true
+                            coornidateSign.y_sign = true
+//                            TextView_Debug.text.append("0 < currentHeading < 90")
+//                        }else if currentHeading > (90 * M_PI )/180.0 && currentHeading <= (180.0 * M_PI)/180.0
+                        }else if currentHeading > 90.0 && currentHeading <= 180.0
+                        {
+                            calHeading = 180.0 - currentHeading
+                            coornidateSign.x_sign = true
+                            coornidateSign.y_sign = false
+//                            TextView_Debug.text.append("90 < currentHeading < 180")
+//                        }else if currentHeading > (180.0 * M_PI )/180.0 && currentHeading <= (270.0 * M_PI)/180.0
+                        }else if currentHeading > 180.0 && currentHeading <= 270.0
+                        {
+                            calHeading = currentHeading - 180.0
+                            coornidateSign.x_sign = false
+                            coornidateSign.y_sign = false
+//                            TextView_Debug.text.append("180 < currentHeading < 270")
+//                        }else if currentHeading > (270.0 * M_PI )/180.0 && currentHeading <= (360.0 * M_PI)/180.0
+                        }else if currentHeading > 270.0 && currentHeading <= 360.0
+                        {
+                            calHeading = 360.0 - currentHeading
+                            coornidateSign.x_sign = false
+                            coornidateSign.y_sign = true
+//                            TextView_Debug.text.append("270 < currentHeading < 360")
+                        }
+                    }
+
+                    calHeading = (calHeading * M_PI)/180.0
+                    if coornidateSign.x_sign {
+                        self.localCoornidate.x += sin(calHeading) * 0.45
+                    }else
+                    {
+                        self.localCoornidate.x -= sin(calHeading)  * 0.45
+                    }
+                    
+                    if coornidateSign.y_sign {
+                        self.localCoornidate.y += cos(calHeading) * 0.45
+                    }else
+                    {
+                        self.localCoornidate.y -= cos(calHeading) * 0.45
+                    }
+                    lastHeading = currentHeading
+                    Label_x.text = "\(self.localCoornidate.x.format(f: ".2"))"
+                    Label_y.text = "\(self.localCoornidate.y.format(f: ".2"))"
+                    
                     print("current:\(current.format(f: ".2")),last:\(last.format(f: ".2"))")
                     //                    switch_Step = false
                 }
@@ -458,6 +542,13 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 
         
     }
+    
+    //MARK: 判断方向针对坐标应该加还是减
+//    func chooseSignForCoornidate()
+//    {
+//        coornidateSign.x_sign
+//        coornidateSign.y_sign
+//    }
     
 //    func go()
 //    {
