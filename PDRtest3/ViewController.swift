@@ -154,7 +154,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
 
         //////////输出测试语句
        // print(Str_FileSave_HomePathWithDocuments!)
-
+//        testPrint()
     }
 
 //    override func didReceiveMemoryWarning() {

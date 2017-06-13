@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		301D67E51EE8FAA1004D5B23 /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = 301D67E31EE8FAA1004D5B23 /* test.c */; };
 		8CF556B11E7B7A0D00C77C64 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF556B01E7B7A0D00C77C64 /* AppDelegate.swift */; };
 		8CF556B31E7B7A0D00C77C64 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF556B21E7B7A0D00C77C64 /* ViewController.swift */; };
 		8CF556B61E7B7A0D00C77C64 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8CF556B41E7B7A0D00C77C64 /* Main.storyboard */; };
@@ -35,6 +36,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		301D67E21EE8FAA1004D5B23 /* PDRtest3-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PDRtest3-Bridging-Header.h"; sourceTree = "<group>"; };
+		301D67E31EE8FAA1004D5B23 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
+		301D67E41EE8FAA1004D5B23 /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		8CF556AD1E7B7A0C00C77C64 /* PDRtest3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PDRtest3.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CF556B01E7B7A0D00C77C64 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8CF556B21E7B7A0D00C77C64 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -106,6 +110,9 @@
 				8CF556B71E7B7A0D00C77C64 /* Assets.xcassets */,
 				8CF556B91E7B7A0D00C77C64 /* LaunchScreen.storyboard */,
 				8CF556BC1E7B7A0D00C77C64 /* Info.plist */,
+				301D67E31EE8FAA1004D5B23 /* test.c */,
+				301D67E41EE8FAA1004D5B23 /* test.h */,
+				301D67E21EE8FAA1004D5B23 /* PDRtest3-Bridging-Header.h */,
 			);
 			path = PDRtest3;
 			sourceTree = "<group>";
@@ -197,6 +204,7 @@
 					8CF556AC1E7B7A0C00C77C64 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = X9ZPU3ABG5;
+						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
@@ -273,6 +281,7 @@
 				8CF556B31E7B7A0D00C77C64 /* ViewController.swift in Sources */,
 				8CF5571F1E7FD20200C77C64 /* DoubleFormater.swift in Sources */,
 				8CF556B11E7B7A0D00C77C64 /* AppDelegate.swift in Sources */,
+				301D67E51EE8FAA1004D5B23 /* test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -427,12 +436,15 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = X9ZPU3ABG5;
 				INFOPLIST_FILE = PDRtest3/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.lixun.PDRtest3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "PDRtest3/PDRtest3-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -442,12 +454,14 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = X9ZPU3ABG5;
 				INFOPLIST_FILE = PDRtest3/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.lixun.PDRtest3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "PDRtest3/PDRtest3-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
