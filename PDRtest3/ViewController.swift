@@ -22,6 +22,10 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     @IBOutlet weak var Label_StepCount: UILabel!
     @IBOutlet weak var TextView_Debug: UITextView!
     
+    @IBOutlet weak var Label_x_afterFilter: UILabel!
+    @IBOutlet weak var Label_y_afterFilter: UILabel!
+    
+    
 //MARK:全局变量、常量
     /////宏
     let HEADINGLIMIT = 50 //超过这个值时保存记录
@@ -86,6 +90,8 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     var backID = UIBackgroundTaskInvalid
     var aa = 0
     
+    /////////////卡尔曼滤波器
+var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
 //    var bgTaskIdList : NSMutableArray?  //
     var bgTaskIdList :[UIBackgroundTaskIdentifier]? = []
     var bgTaskIdList2:NSMutableArray = NSMutableArray.init()
@@ -461,12 +467,23 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
                     {
                         self.localCoornidate.y -= cos(calHeading) * 0.45
                     }
+                    
+                    
                     lastHeading = currentHeading
-                    Label_x.text = "\(self.localCoornidate.x.format(f: ".2"))"
-                    Label_y.text = "\(self.localCoornidate.y.format(f: ".2"))"
+                    Label_x.text = "\(self.localCoornidate.x.format(f: ".6"))"
+                    Label_y.text = "\(self.localCoornidate.y.format(f: ".6"))"
                     
                     print("current:\(current.format(f: ".2")),last:\(last.format(f: ".2"))")
                     //                    switch_Step = false
+                    
+                    ///////执行一下滤波技术
+                    self.localCoornidate.x = lxKalman.filterStep(Observation: self.localCoornidate.x)
+                    self.localCoornidate.y = lxKalman.filterStep(Observation: self.localCoornidate.y)
+                    
+                    Label_x_afterFilter.text = "\(self.localCoornidate.x.format(f: ".6"))"
+                    Label_y_afterFilter.text = "\(self.localCoornidate.y.format(f: ".6"))"
+                    ///////////////////////////////////
+                    
                 }
                 //                last = current
 //                if i > 10
@@ -613,7 +630,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
         
         
 
-        
+    
         
             bgTaskId = application.beginBackgroundTask(expirationHandler: {
                 print("background task \(bgTaskId as Int) expired\n")
