@@ -72,10 +72,14 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     //////文件存储路径
     let Str_FileSave_HomePathWithDocuments:String? = NSHomeDirectory() + "/Documents/"
     var Str_FileSave_fileName:String? = ""  //这个文件名可以设置为当前日期
+    
     let Str_FileSave_suffix:String? = ".txt"
     var Str_FileSave_fullDirect:String? = ""    //用于存储文件最终生成的路径
+    var Str_FileSave_fullDirect_coordinate:String? = ""//用来保存坐标的全路径
     var Str_FileSave_singleItem:String? = ""    //保存构造的单独一条记录 可以在文件追加时候直接保存进去就好了
     
+    var Str_FileSave_coordinate:String? = ""
+//    var Str_FileSave_coordinate_Kalman:String? = ""//估计用不到
     //////////////计时器
     var timer:Timer? = nil
     var Int_Timer_currentSecond = 0
@@ -168,7 +172,7 @@ var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
 //        // Dispose of any resources that can be recreated.
 //    }
 
-    
+
     //////开始更新Btn
     @IBAction func Btn_Action_Start(_ sender: Any) {
         if CMPedometer.isDistanceAvailable()
@@ -473,6 +477,9 @@ var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
                     Label_x.text = "\(self.localCoornidate.x.format(f: ".6"))"
                     Label_y.text = "\(self.localCoornidate.y.format(f: ".6"))"
                     
+                    saveCoordinate(self.localCoornidate.x.format(f: ".6"),self.localCoornidate.y.format(f: ".6"),false)
+//                    saveCoordinate("1.02", "2.45", false)
+                    
                     print("current:\(current.format(f: ".2")),last:\(last.format(f: ".2"))")
                     //                    switch_Step = false
                     
@@ -482,6 +489,9 @@ var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
                     
                     Label_x_afterFilter.text = "\(self.localCoornidate.x.format(f: ".6"))"
                     Label_y_afterFilter.text = "\(self.localCoornidate.y.format(f: ".6"))"
+                    
+                    saveCoordinate(Label_x_afterFilter.text!,Label_y_afterFilter.text!,true)
+//                     saveCoordinate("2880.0", "245.49", true)
                     ///////////////////////////////////
                     
                 }
@@ -701,6 +711,39 @@ var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
 //        }
     }
 
+    
+    func saveCoordinate(_ x:String,_ y:String,_ kalman:Bool) //true表示是滤波后的 存到另一个文件里面
+    {
+            var tempStr = "\(x),\(y)| " //x1,y1| x2,y2|
+            var tempFileHandle:FileHandle? = nil
+            do{ //添加了文件读写时用到的追加模式
+                
+                let tempDateFormate = self.dateFormatter.dateFormat
+                self.dateFormatter.dateFormat = "yyyy-MM-dd"
+                self.Str_FileSave_fileName = self.dateFormatter.string(from: Date())
+                    if kalman == true
+                    {
+                    self.Str_FileSave_fullDirect_coordinate = "\(self.Str_FileSave_HomePathWithDocuments!)\(self.Str_FileSave_fileName!)coordinate_Kalman\(self.Str_FileSave_suffix!)"
+                    }else
+                    {
+                    self.Str_FileSave_fullDirect_coordinate = "\(self.Str_FileSave_HomePathWithDocuments!)\(self.Str_FileSave_fileName!)coordinate\(self.Str_FileSave_suffix!)"
+                    }
+                self.dateFormatter.dateFormat = tempDateFormate
+                
+                if !self.fileManager.fileExists(atPath: self.Str_FileSave_fullDirect_coordinate!) {
+                    try! tempStr.write(toFile: self.Str_FileSave_fullDirect_coordinate!, atomically: true, encoding: .utf8)
+                }else
+                {
+                    try!  tempFileHandle = FileHandle.init(forUpdating: URL.init(string: self.Str_FileSave_fullDirect_coordinate!)!)
+                    tempFileHandle?.seekToEndOfFile()
+                    let tempData = tempStr.data(using: .utf8)
+                    tempFileHandle?.write(tempData!)
+                    tempFileHandle?.closeFile()
+                }
+            }catch{ }
+        
+        
+    }
 
     
 }//end of class
