@@ -241,12 +241,13 @@ var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
     
     ///////航向更新时 UI如何处理
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        self.Label_Heading.text = "\(newHeading.trueHeading)"
+        self.Label_Heading.text = "\(self.currentHeading)"//"\(newHeading.trueHeading)"
         
-//        ViewController.changedValue += abs(Int(newHeading.trueHeading - self.currentHeading))  ////////这个是用来控制变动范围的 目前暂时弃用
+//        ViewController.changedValue +=  abs(Int(newHeading.trueHeading - self.currentHeading))  ////////这个是用来控制变动范围的 目前暂时弃用
 //                self.currentHeading = newHeading.trueHeading //- 25 //把newHeading传出去 让currentHeading作为当前方向
         //注意上面的25是在课题室做实验的补偿 为了好计算距离坐标 不能在这里补偿
         
+        ////////////不要这段补偿试试呢?
 //        如果拿在手上 可以直接让self.currentHeading = newHeading.trueHeading
 // 这个补偿180 是放在口袋里 并且是几乎横着放的
         if newHeading.trueHeading < 180 {
@@ -256,6 +257,9 @@ var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
         {
              self.currentHeading = newHeading.trueHeading - 180.0
         }
+        
+        
+        
 //        self.currentHeading = (newHeading.trueHeading - 90).truncatingRemainder(dividingBy: 360)
         self.calHeading_Array.append(self.currentHeading)
         
