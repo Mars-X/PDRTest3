@@ -95,7 +95,7 @@ class ViewController: UIViewController,CLLocationManagerDelegate {
     var aa = 0
     
     /////////////卡尔曼滤波器
-var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
+    var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
 //    var bgTaskIdList : NSMutableArray?  //
     var bgTaskIdList :[UIBackgroundTaskIdentifier]? = []
     var bgTaskIdList2:NSMutableArray = NSMutableArray.init()
@@ -344,9 +344,9 @@ var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
 //        self.Label_y.text = "\((currentHeading).format(f: ".2"))"
         
         
-        pow(currentAcceleration!.z,2.0)
-        pow(currentAcceleration!.x,2.0)
-        pow(currentAcceleration!.y,2.0)
+//        pow(currentAcceleration!.z,2.0)
+//        pow(currentAcceleration!.x,2.0)
+//        pow(currentAcceleration!.y,2.0)
         //只用z轴改成求模
         calACC = 9.8 * sqrt(pow(currentAcceleration!.z,2.0) + pow(currentAcceleration!.x,2.0) + pow(currentAcceleration!.y,2.0))
         calACC_Array.append(calACC)
@@ -405,7 +405,7 @@ var lxKalman:LXKalman = LXKalman.init(Q: 1, R: 1, X0: 0.5, P0: 0.4)
         var countStep_thisloop = 0
         var currentSub = 0.0//相隔几个
         var last = 9.8
-        if Double(calACC_Array.count) >= STEPTIME*5.0
+        if Double(calACC_Array.count) >= STEPTIME*5.0 // 采集频率为 每次0.2秒 所以1秒钟可以采集5.0个数据  
         {
             var current = calACC_Array[0]
 
